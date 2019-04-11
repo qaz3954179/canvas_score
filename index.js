@@ -196,4 +196,3 @@ var sl = new ScoreLine({
   }
 });
 sl.setValue(820)
-document.querySelector('#img').src = fillImg

@@ -63,20 +63,25 @@ class ScoreLine {
     
     ctx.fillStyle = option.backgroundColor;
     ctx.fillRect(0, 0, option.width, option.height);
-    await this.drawScreen();
     var el = document.querySelector(this.option.el);
     el.appendChild(canvas);
     canvas.style.width = el.style.width;
   }
+  cleanScreen() {
+    const option = this._option;
+    this.ctx.fillStyle = option.backgroundColor;
+    this.ctx.fillRect(0, 0, option.width, option.height);
+  }
   async drawScreen() {
+    this.cleanScreen();
     const option = this._option;
     const padding = this._option.padding;
     var rate = this.rate;
-    var bg = await this.loadImage(this._option.bgImg);
+    var bg = await this.loadImage(option.bgImg);
     const ctx = this.ctx;
     var dW = this.scaleW;
     var dH = dW * bg.height / bg.width
-    var colCount = this._option.scale.grids * 2 - 1;
+    var colCount = option.scale.grids * 2 - 1;
     var col = dW / colCount;
     var d = Math.floor(dW * rate / col);
     var offset = d * col;
@@ -84,7 +89,7 @@ class ScoreLine {
     offset = d % 2 == 0 ? offset + 2 * col : offset + col;
     // 加载背景图片
     ctx.drawImage(bg, 0, 0, bg.width, bg.height, padding.left, padding.top, dW, dH);
-    var line = await this.loadImage(this._option.frontImg);
+    var line = await this.loadImage(option.frontImg);
     // 加载前景图片
     ctx.drawImage(line, 0, 0, line.width * rate, line.height, padding.left, padding.top, dW * rate, dH + 2 * this.ratio);
     ctx.save();
@@ -103,9 +108,14 @@ class ScoreLine {
     const tW = dW / 10;
     const tH = tW * tagImage.height / tagImage.width;
     ctx.drawImage(tagImage, 0, 0, tagImage.width, tagImage.height, offset - tW / 2 + col / 2, padding.top - dH / 2 - 20 * this.ratio, tW, tH)
-    // 加载数值
-    ctx.fillStyle = '#fff'
-    ctx.fillText(this.value, offset + col, padding.top - tH / 2 - 15 * this.ratio)
+     // 加载数值
+     ctx.beginPath()
+     ctx.fillStyle = '#fff'
+     ctx.textAlign = option.font.align
+     ctx.font = option.font.family
+     ctx.fillText(this.value, offset + col / 2, padding.top - tH / 2 - 15 * this.ratio, tW)
+     ctx.closePath()
+     ctx.restore()
     // 加载刻度值
     this.drawScale(dW, dH + padding.top);
   }
